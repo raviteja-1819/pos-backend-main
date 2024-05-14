@@ -25,7 +25,6 @@ exports.createEmployee = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
-
 // Update an employee
 exports.updateEmployee = async (req, res) => {
   try {
