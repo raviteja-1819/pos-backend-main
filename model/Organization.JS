@@ -1,37 +1,29 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
-const Employee = sequelize.define('Employee', {
-  id: {
+const Organization = sequelize.define('Organization', {
+    id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
   },
-  firstName: {
+  organizationName: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  organizationType: {
     type: DataTypes.STRING,
     allowNull: false
   },
-  lastName: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  photo: {
-    type: DataTypes.BLOB,
-    allowNull: true 
-  },
-  shiftStartsFrom: {
+  openingTime: {
     type: DataTypes.TIME,
     allowNull: false,
   },
-  shiftEndsFrom: {
+  closingTime: {
     type: DataTypes.TIME,
     allowNull: false,
-  },
-  email: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true
+   
   }
 });
 
-module.exports = Employee;
+module.exports = Organization;
