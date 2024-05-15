@@ -1,13 +1,28 @@
-// routes/inventoryRoutes.js
+// routes/itemRoutes.js
 
 const express = require('express');
 const router = express.Router();
-const inventoryController = require('../controllers/inventoryController');
+const itemController = require('../controllers/inventoryController');
 
-router.post('/items', inventoryController.addItem);
-router.put('/items/:itemId', inventoryController.editItem);
-router.delete('/items/:itemId', inventoryController.deleteItem);
-router.get('/items', inventoryController.getAllItems);
-router.get('/items/category/:category', inventoryController.getItemsByCategory);
-router.get('/items/search', inventoryController.searchItems);
+// Route to create a new item
+router.post('/items', itemController.createItem);
+
+// Route to get all items
+router.get('/items', itemController.getAllItems);
+
+// Route to get items by category
+router.get('/items/category/:category', itemController.getItemsByCategory);
+
+// Route to search for items by name
+router.get('/items/search', itemController.searchItemsByName);
+
+// Route to get a single item by ID
+router.get('/items/:id', itemController.getItemById);
+
+// Route to update an item by ID
+router.put('/items/:id', itemController.updateItem);
+
+// Route to delete an item by ID
+router.delete('/items/:id', itemController.deleteItem);
+
 module.exports = router;

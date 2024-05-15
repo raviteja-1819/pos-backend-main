@@ -1,116 +1,131 @@
-// controllers/inventoryController.js
+// controllers/itemController.js
 
-const Item = require('../model/Item');
+const  Item  = require('../model/Item');
 const { Op } = require('sequelize');
-exports.searchItems = async (req, res) => {
-  const { query } = req.query;
-  try {
-    const items = await Item.findAll({
-      where: {
-        [Op.or]: [
-          { name: { [Op.like]: `%${query}%` } }, // Search by item name (case-insensitive)
-          { category: { [Op.like]: `%${query}%` } } // Search by category (case-insensitive)
-        ]
+const inventoryController = {
+  // Create a new item
+  async createItem(req, res) {
+    try {
+      const { name, description, price, category, availability } = req.body;
+      
+      // Validate mandatory fields
+      if (!name || !price || !category) {
+        return res.status(400).json({ error: 'Please fill all mandatory fields.' });
       }
-    });
-    res.json({ items });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-};
 
-// Controller function to add a new item to the inventory
-exports.addItem = async (req, res) => {
-  try {
-    // Extract item details from request body
-    const { name, mrp, discount, category, description } = req.body;
+      // Create the item
+      const item = await Item.create({
+        name,
+        description,
+        price,
+        category,
+        availability
+      });
 
-    // Create new item in the inventory
-    const newItem = await Item.create({
-      name,
-      mrp,
-      discount,
-      category,
-      description
-    });
-
-    res.status(201).json({ message: 'Item added successfully', item: newItem });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-};
-
-// Controller function to edit an existing item in the inventory
-exports.editItem = async (req, res) => {
-  const itemId = req.params.itemId;
-  try {
-    const updatedItem = await Item.findByPk(itemId);
-    if (!updatedItem) {
-      return res.status(404).json({ message: 'Item not found' });
+      return res.status(201).json(item);
+    } catch (error) {
+      console.error('Error creating item:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
     }
+  },
 
-    // Update item details
-    const { name, mrp, price, discount, category, description } = req.body;
-    updatedItem.name = name;
-    updatedItem.mrp = mrp;
-   
-    updatedItem.discount = discount;
-    updatedItem.category = category;
-    updatedItem.description = description;
-
-    // Save the changes to the database
-    await updatedItem.save();
-
-    res.json({ message: 'Item updated successfully', item: updatedItem });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-};
-
-// Controller function to delete an item from the inventory
-exports.deleteItem = async (req, res) => {
-  const itemId = req.params.itemId;
-  try {
-    const deletedItem = await Item.findByPk(itemId);
-    if (!deletedItem) {
-      return res.status(404).json({ message: 'Item not found' });
+  // Get all items
+  async getAllItems(req, res) {
+    try {
+      const items = await Item.findAll();
+      return res.status(200).json(items);
+    } catch (error) {
+      console.error('Error getting items:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
     }
+  },
 
-    // Delete the item from the database
-    await deletedItem.destroy();
-
-    res.json({ message: 'Item deleted successfully' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-};
-
-// Controller function to display all items in the inventory
-exports.getAllItems = async (req, res) => {
-  try {
-    const items = await Item.findAll();
-    res.json({ items });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-};
-
-exports.getItemsByCategory = async (req, res) => {
-  const category = req.params.category;
-  try {
-    const items = await Item.findAll({
-      where: {
-        category: category
+  // Get an item by ID
+  async getItemById(req, res) {
+    try {
+      const { id } = req.params;
+      const item = await Item.findByPk(id);
+      if (!item) {
+        return res.status(404).json({ error: 'Item not found.' });
       }
-    });
-    res.json({ items });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
+      return res.status(200).json(item);
+    } catch (error) {
+      console.error('Error getting item by ID:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+  },
+
+   // Get items by category
+   async getItemsByCategory(req, res) {
+    try {
+      const { category } = req.params;
+      const items = await Item.findAll({ where: { category } });
+      return res.status(200).json(items);
+    } catch (error) {
+      console.error('Error getting items by category:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+  },
+
+  // Search for items by name
+  async searchItemsByName(req, res) {
+    try {
+      const { name } = req.query;
+      const items = await Item.findAll({ where: { name: { [Op.like]: `%${name}%` } } });
+      return res.status(200).json(items);
+    } catch (error) {
+      console.error('Error searching items by name:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+  },
+
+  // Update an item
+  async updateItem(req, res) {
+    try {
+      const { id } = req.params;
+      const { name, description, price, category, availability } = req.body;
+
+      // Validate mandatory fields
+      if (!name || !price || !category) {
+        return res.status(400).json({ error: 'Please fill all mandatory fields.' });
+      }
+
+      const item = await Item.findByPk(id);
+      if (!item) {
+        return res.status(404).json({ error: 'Item not found.' });
+      }
+
+      // Update item details
+      item.name = name;
+      item.description = description;
+      item.price = price;
+      item.category = category;
+      item.availability = availability;
+
+      await item.save();
+
+      return res.status(200).json(item);
+    } catch (error) {
+      console.error('Error updating item:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+  },
+
+  // Delete an item
+  async deleteItem(req, res) {
+    try {
+      const { id } = req.params;
+      const item = await Item.findByPk(id);
+      if (!item) {
+        return res.status(404).json({ error: 'Item not found.' });
+      }
+      await item.destroy();
+      return res.status(204).send();
+    } catch (error) {
+      console.error('Error deleting item:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
   }
 };
+
+module.exports = inventoryController;
