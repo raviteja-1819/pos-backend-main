@@ -3,9 +3,11 @@
 const express = require('express');
 const router = express.Router();
 const itemController = require('../controllers/inventoryController');
+const multer = require('multer');
+const upload = multer();
 
 // Route to create a new item
-router.post('/items', itemController.createItem);
+router.post('/items',upload.single('photo'), itemController.createItem);
 
 // Route to get all items
 router.get('/items', itemController.getAllItems);
