@@ -1,13 +1,25 @@
 const bcrypt = require('bcryptjs');
 const moment = require('moment');
 const User = require('../model/Users');
-
+const { v4: uuidv4 } = require('uuid');  // Import the UUID librar
 // Counter to keep track of the user count
 let userCounter = 0;
 
 exports.signup = async (req, res) => {
   try {
-    const { firstName, lastName, mobileNumber, designation, email, shiftStartsFrom, shiftEndsFrom, password } = req.body;
+    const { firstName, lastName, mobileNumber, email, shiftStartsFrom, shiftEndsFrom, password, roleId } = req.body;
+
+    // Check if the email or mobile number already exist in the database
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Email already exists' });
+    }
+
+    const existingMobile = await User.findOne({ where: { mobileNumber } });
+    if (existingMobile) {
+      return res.status(400).json({ error: 'Mobile number already exists' });
+    }
+
     // Parse and format shift start time
     const startTime = moment(shiftStartsFrom, 'h:mm A').format('HH:mm:ss');
 
@@ -15,17 +27,17 @@ exports.signup = async (req, res) => {
     const endTime = moment(shiftEndsFrom, 'h:mm A').format('HH:mm:ss');
 
     // Generate userId
-    const userId = generateUserId();
+    const userId = uuidv4();  // Generate a unique userId
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const requestBodyWithoutPassword = { 
       firstName, 
       lastName, 
-      mobileNumber, 
-      designation, 
+      mobileNumber,  
       email, 
       shiftStartsFrom: startTime, 
-      shiftEndsFrom: endTime
+      shiftEndsFrom: endTime,
+      roleId
     };
 
     // Log the request body without the password field
@@ -37,14 +49,14 @@ exports.signup = async (req, res) => {
       firstName, 
       lastName, 
       mobileNumber, 
-      designation, 
       email, 
       shiftStartsFrom: startTime, 
       shiftEndsFrom: endTime, 
-      password: hashedPassword 
+      password: hashedPassword,
+      roleId
     });
 
-    res.status(201).json(user);
+    res.status(201).json({userId,firstName,lastName,mobileNumber,email,shiftStartsFrom,shiftEndsFrom,roleId});
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });

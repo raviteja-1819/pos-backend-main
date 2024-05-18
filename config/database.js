@@ -7,4 +7,5 @@ const sequelize = new Sequelize('pos', 'root','CycloTech@1234', {
   dialect: 'mysql',
 });
 
+
 module.exports = sequelize;

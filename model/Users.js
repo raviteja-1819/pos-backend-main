@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
+const Role = require('./Role');
 
 const Users = sequelize.define('Users', {
   id: {
@@ -20,17 +21,19 @@ const Users = sequelize.define('Users', {
     type: DataTypes.STRING,
     allowNull: false
   },
+  photo: {
+    type: DataTypes.BLOB,
+    allowNull: true 
+  },
   mobileNumber: {
     type: DataTypes.STRING,
     allowNull: false,
+    unique: true
   },
-  designation: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-},
-email: {
-  type: DataTypes.INTEGER,
+  email: {
+    type: DataTypes.STRING,
   allowNull: false,
+  unique: true
 },
 shiftStartsFrom: {
     type: DataTypes.TIME,
@@ -43,9 +46,16 @@ shiftStartsFrom: {
   password: {
     type: DataTypes.STRING,
     allowNull: false,
+  },
+  roleId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: Role,
+      key: 'id'
+    }
   }
 
-
 });
-
+Users.belongsTo(Role, { foreignKey: 'roleId' });
 module.exports = Users;

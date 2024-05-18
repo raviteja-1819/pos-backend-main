@@ -1,13 +1,18 @@
 const express = require('express');
 const router = express.Router();
+const { verifyToken, isAdmin } = require('../middlewares/authMiddleware');
 const employeeController = require('../controllers/employeeController');
 
-// Employee routes
-router.get('/employee/getAll', employeeController.getAllEmployees);
-router.post('/employee/create', employeeController.createEmployee);
-router.put('/empupdate/:id', employeeController.updateEmployee);
-router.delete('/empdelete/:id', employeeController.deleteEmployee);
-// GET route to fetch employee details //  enrolled route 
-router.get('/employees/details', employeeController.getEmployeeDetails);
+// Admin routes
+router.get('/employees', verifyToken, isAdmin, employeeController.getAllEmployees);
+router.post('/employees', verifyToken, isAdmin, employeeController.createEmployee);
+router.put('/employees/:id', verifyToken, isAdmin, employeeController.updateEmployee);
+router.delete('/employees/:id', verifyToken, isAdmin, employeeController.deleteEmployee);
+
+// Employee route to update own data
+router.put('/employees/update', verifyToken, employeeController.updateOwnData);
+
+// Enrolled employees route
+router.get('/employee-details', verifyToken, isAdmin, employeeController.getEmployeeDetails);
 
 module.exports = router;
