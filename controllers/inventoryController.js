@@ -1,25 +1,34 @@
 // controllers/itemController.js
-
-const  Item  = require('../model/Item');
+const Item = require('../model/Item');
 const { Op } = require('sequelize');
+const multer = require('multer');
+
+// Configure multer to handle file uploads
+const upload = multer();
+
 const inventoryController = {
   // Create a new item
+ // Middleware to handle file upload
   async createItem(req, res) {
     try {
       const { name, description, price, category, availability } = req.body;
-      
-      // Validate mandatory fields
-      if (!name || !price || !category) {
-        return res.status(400).json({ error: 'Please fill all mandatory fields.' });
+console.log(req.body);
+      // Check if file upload succeeded
+      if (!req.file) {
+        return res.status(400).json({ error: 'Please upload an image.' });
       }
 
-      // Create the item
+      // Read the image file and convert it to base64
+      const base64Photo = req.file.buffer.toString('base64');
+
+      // Create the item with the base64 encoded image
       const item = await Item.create({
         name,
         description,
         price,
         category,
-        availability
+        availability,
+        photo: base64Photo
       });
 
       return res.status(201).json(item);
@@ -28,8 +37,7 @@ const inventoryController = {
       return res.status(500).json({ error: 'Internal Server Error' });
     }
   },
-
-  // Get all items
+      // Get all items
   async getAllItems(req, res) {
     try {
       const items = await Item.findAll();

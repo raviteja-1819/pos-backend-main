@@ -1,8 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../model/Users');
-const jwt_secret = 'e0aef50129d2695d4b4707c1cd1e0666eeb2993c38e66037d60d7b229ef2ad9310141863f8c9b914f9378fe44f656a4ae78578c4d343b576c94ac034698a9852';
-
+const jwt_secret = process.env.SECRET_KEY
 exports.login = async (req, res) => {
   try {
     const { identifier, password } = req.body;
@@ -19,7 +18,7 @@ exports.login = async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-
+   
     // Compare passwords
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {

@@ -3,9 +3,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const sequelize = require('./config/database');
-
+require('dotenv').config();
 const app = express();
-
 app.use(bodyParser.json());
 
 // Routes   
@@ -14,13 +13,17 @@ const signupRoutes = require('./routes/signupRoutes');
 const inventoryRoutes = require('./routes/inventoryRoutes');
 const employeeRoutes = require('./routes/employeeRoutes');
 const organizationRoutes = require('./routes/organizationRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 const roleRoutes  = require('./routes/roleRoutes');
+
 app.use('/api', loginRoutes);
 app.use('/api', signupRoutes);
 app.use('/api', inventoryRoutes);
 app.use('/api', employeeRoutes);
 app.use('/api', organizationRoutes);
+app.use('/payment', paymentRoutes);
 app.use('/api', roleRoutes);
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);

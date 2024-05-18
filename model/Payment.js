@@ -2,12 +2,12 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 const Payment = sequelize.define('Payment', {
-  payment_id: {
+  paymentId: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
   },
-  order_id: {
+  orderId: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
@@ -15,7 +15,7 @@ const Payment = sequelize.define('Payment', {
       key: 'order_id'
     }
   },
-  payment_date: {
+  paymentDate: {
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW
@@ -24,17 +24,17 @@ const Payment = sequelize.define('Payment', {
     type: DataTypes.FLOAT,
     allowNull: false
   },
-  payment_method: {
+  paymentMethod: {
     type: DataTypes.STRING,
     allowNull: false
   },
-  transaction_id: {
+  transactionId: {
     type: DataTypes.STRING,
     allowNull: true
   },
-  payment_status: {
+  paymentStatus: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   }
 });
 
