@@ -15,7 +15,14 @@ const employeeRoutes = require('./routes/employeeRoutes');
 const organizationRoutes = require('./routes/organizationRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const roleRoutes  = require('./routes/roleRoutes');
+const tableRoutes = require('./routes/tableRoutes');
 
+const orderRoutes = require('./routes/orderRoutes');
+// Middleware
+app.use(express.json());
+
+// Routes
+app.use('/api', tableRoutes);
 app.use('/api', loginRoutes);
 app.use('/api', signupRoutes);
 app.use('/api', inventoryRoutes);
@@ -23,6 +30,7 @@ app.use('/api', employeeRoutes);
 app.use('/api', organizationRoutes);
 app.use('/payment', paymentRoutes);
 app.use('/api', roleRoutes);
+app.use('/api', orderRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -42,4 +50,4 @@ sequelize.sync()
   .catch(err => {
     console.error('Database synchronization failed:', err);
   });
-  // testing 
+  

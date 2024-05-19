@@ -8,7 +8,6 @@ const upload = multer();
 
 const inventoryController = {
   // Create a new item
- // Middleware to handle file upload
   async createItem(req, res) {
     try {
       const { name, description, price, category, availability } = req.body;
@@ -20,8 +19,6 @@ console.log(req.body);
 
       // Read the image file and convert it to base64
       const base64Photo = req.file.buffer.toString('base64');
-
-      // Create the item with the base64 encoded image
       const item = await Item.create({
         name,
         description,
