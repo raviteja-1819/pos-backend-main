@@ -17,7 +17,7 @@ const paymentRoutes = require('./routes/paymentRoutes');
 const roleRoutes  = require('./routes/roleRoutes');
 const tableRoutes = require('./routes/tableRoutes');
 
-const orderRoutes = require('./routes/orderRoutes');
+const orderItemRoutes = require('./routes/orderItemRoutes');
 // Middleware
 app.use(express.json());
 
@@ -30,7 +30,7 @@ app.use('/api', employeeRoutes);
 app.use('/api', organizationRoutes);
 app.use('/payment', paymentRoutes);
 app.use('/api', roleRoutes);
-app.use('/api', orderRoutes);
+app.use('/api', orderItemRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
