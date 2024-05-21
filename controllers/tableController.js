@@ -19,7 +19,7 @@ exports.table = async (req, res) => {
       table_id: table_id 
     });
 
-    res.status(201).json({ message: 'Table created successfully', table });
+    res.status(200).json({ message: 'Table created successfully', table });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
@@ -38,32 +38,35 @@ exports.getTables = async (req, res) => {
 };
 
 // Get table details by tableId
-exports.getTableById = async (req, res) => { // Add async keyword
+exports.getTableById = async (req, res) => { 
   try {
     const { table_id } = req.params;
-    const item = await Table.findByPk(table_id); // Use table_id instead of id
-    if (!item) {
+    const table = await Table.findByPk(table_id); 
+    if (!table) {
       return res.status(404).json({ error: 'Table not found.' });
     }
-    return res.status(200).json(item);
+    return res.status(200).json(table);
   } catch (error) {
     console.error('Error getting table by ID:', error);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 
+
 // get tables by it's status
 exports.getTablesByStatus = async (req, res) => {
-    try {
-        const { status } = req.params;
-        const tables = await Table.findAll({ where: { status } });
-        res.status(200).json({ message: 'Tables fetched successfully', tables });
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: 'Internal server error' });
-            }
-            };
-
+  try {
+      const {status} = req.params;
+      const tables = await Table.findAll({ where: {status} });
+      if (tables.length === 0) {
+          return res.status(404).json({ message: 'No tables found with the given status' });
+      }
+      res.status(200).json({ message: 'Tables fetched successfully', tables });
+  } catch (error) {
+      console.error('Error fetching tables by status:', error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+};
 // update table by status
 exports.updateTableStatus = async (req, res) => {
     try {

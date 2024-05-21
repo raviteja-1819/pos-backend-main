@@ -10,18 +10,12 @@ const OrderItem = sequelize.define('OrderItem', {
   order_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    references: {
-      model: 'Order',
-      key: 'order_id'
-    }
+    
   },
   item_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    references: {
-      model: 'MenuItem',
-      key: 'item_id'
-    }
+    
   },
   quantity: {
     type: DataTypes.INTEGER,

@@ -1,14 +1,46 @@
 const bcrypt = require('bcryptjs');
 const moment = require('moment');
+const { Op } = require('sequelize');
 const User = require('../model/Users');
-const { v4: uuidv4 } = require('uuid');  // Import the UUID librar
-// Counter to keep track of the user count
+const { v4: uuidv4 } = require('uuid');
+const multer = require('multer');  
+const upload = multer();
+
+
 let userCounter = 0;
 
+function generateUserId() {
+  userCounter++;
+
+  // Check if the counter reaches maximum numeric value (all nines)
+  if (userCounter === Number.MAX_SAFE_INTEGER) {
+    // Reset the counter to start from 0
+    userCounter = 0;
+  }
+
+  // Convert the counter to alphanumeric format
+  const userId = convertToAlphanumeric(userCounter).padStart(9, '0');
+
+  return userId;
+}
+
+function convertToAlphanumeric(numericUserId) {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let alphanumericUserId = '';
+  while (numericUserId > 0) {
+    const remainder = numericUserId % characters.length;
+    alphanumericUserId = characters.charAt(remainder) + alphanumericUserId;
+    numericUserId = Math.floor(numericUserId / characters.length);
+  }
+
+  return alphanumericUserId;
+}
 exports.signup = async (req, res) => {
   try {
-    const { firstName, lastName, mobileNumber, email, shiftStartsFrom, shiftEndsFrom, password, roleId } = req.body;
-
+    const { id, firstName, lastName, mobileNumber, designation, email, shiftStartsFrom, shiftEndsFrom, password } = req.body;
+    if (!req.file) {
+      return res.status(400).json({ error: 'Please upload an image.' });
+    }
     // Check if the email or mobile number already exist in the database
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
@@ -27,59 +59,41 @@ exports.signup = async (req, res) => {
     const endTime = moment(shiftEndsFrom, 'h:mm A').format('HH:mm:ss');
 
     // Generate userId
-    const userId = uuidv4();  // Generate a unique userId
+    const userId = generateUserId();  // Using the custom function to generate userId
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const requestBodyWithoutPassword = { 
-      firstName, 
-      lastName, 
-      mobileNumber,  
-      email, 
-      shiftStartsFrom: startTime, 
-      shiftEndsFrom: endTime,
-      roleId
+    const requestBodyWithoutPassword = {
+      firstName,
+      lastName,
+      designation,
+      mobileNumber,
+      email,
+      shiftStartsFrom: startTime,
+      shiftEndsFrom: endTime
     };
 
     // Log the request body without the password field
     console.log('Request Body (without password):', requestBodyWithoutPassword);
 
     // Create new user
-    const user = await User.create({ 
-      userId, 
-      firstName, 
-      lastName, 
-      mobileNumber, 
-      email, 
-      shiftStartsFrom: startTime, 
-      shiftEndsFrom: endTime, 
+    const base64Photo = req.file.buffer.toString('base64');
+    const user = await User.create({
+      id,
+      userId,
+      firstName,
+      lastName,
+      designation,
+      mobileNumber,
+      email,
+      shiftStartsFrom: startTime,
+      shiftEndsFrom: endTime,
       password: hashedPassword,
-      roleId
+      photo: base64Photo
     });
 
-    res.status(201).json({userId,firstName,lastName,mobileNumber,email,shiftStartsFrom,shiftEndsFrom,roleId});
+    res.status(201).json({ userId, firstName, lastName, mobileNumber, email, shiftStartsFrom, shiftEndsFrom, roleId });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
-
-function generateUserId() {
-  userCounter++;
-
-  // Convert the counter to 9-character alphanumeric format
-  const userId = convertToAlphanumeric(userCounter).padStart(9, '0');
-
-  return userId;
-}
-
-function convertToAlphanumeric(numericUserId) {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let alphanumericUserId = '';
-  while (numericUserId > 0) {
-    const remainder = numericUserId % characters.length;
-    alphanumericUserId = characters.charAt(remainder) + alphanumericUserId;
-    numericUserId = Math.floor(numericUserId / characters.length);
-  }
-
-  return alphanumericUserId;
-}

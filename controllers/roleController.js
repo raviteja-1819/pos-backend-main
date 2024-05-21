@@ -1,6 +1,7 @@
 // controllers/roleController.js
 
 const Role = require('../model/Role');
+const { uuid } = require('uuid');
 
 // Get all roles
 exports.getAllRoles = async (req, res) => {
@@ -14,16 +15,26 @@ exports.getAllRoles = async (req, res) => {
 };
 
 // Create a new role
+const { v4: uuidv4 } = require('uuid');
+
 exports.createRole = async (req, res) => {
-  const { name, description } = req.body;
-  try {
-    const role = await Role.create({ name, description });
-    res.status(201).json(role);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
+    const { name, description } = req.body;
+    console.log(req.body);
+    const uuid = uuidv4();
+    const id = uuid.substr(0, 4); // Extract the first 4 characters of the UUID
+    try {
+        const role = await Role.create({
+            name: name,
+            description: description,
+            id: id 
+        });
+        res.status(201).json(role);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 };
+
 
 // Update a role
 exports.updateRole = async (req, res) => {
@@ -51,7 +62,7 @@ exports.deleteRole = async (req, res) => {
       return res.status(404).json({ error: 'Role not found' });
     }
     await role.destroy();
-    res.status(204).send();
+    res.status(204).json({ error: 'role deleted successfully' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });

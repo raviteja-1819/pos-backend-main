@@ -2,10 +2,9 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 const Table = sequelize.define('Table', {
-  table_id: {
+  table_id:{
     type: DataTypes.INTEGER,
     primaryKey: true,
-    autoIncrement: true
   },
   table_number: {
     type: DataTypes.INTEGER,
@@ -17,7 +16,7 @@ const Table = sequelize.define('Table', {
   },
   status: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
   },
   seating_area: {
     type: DataTypes.STRING,

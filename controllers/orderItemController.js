@@ -6,8 +6,6 @@ const OrderItem = require('../model/OrderItem');
 exports.addItemToOrder = async (req, res) => {
   try {
     const { order_id, product_id, quantity, item_price } = req.body;
-
-    // Create the order item
     const orderItem = await OrderItem.create({
       order_id: order_id,
       product_id: product_id,
@@ -48,8 +46,6 @@ exports.updateItemInOrder = async (req, res) => {
 exports.removeItemFromOrder = async (req, res) => {
   try {
     const { order_item_id } = req.params;
-
-    // Find the order item by ID and delete it
     const orderItem = await OrderItem.findByPk(order_item_id);
     if (!orderItem) {
       return res.status(404).json({ error: 'Order item not found' });
