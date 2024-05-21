@@ -14,15 +14,12 @@ exports.getAllEmployees = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
-
 // Create a new employee 
 exports.createEmployee = async (req, res) => {
   try {
     const { shiftStartsFrom, shiftEndsFrom, password, ...rest } = req.body;
-
     // Generate a unique user ID
     const userId = uuidv4();
-
     // Format shift timings using Moment.js
     const formattedShiftStart = moment(shiftStartsFrom, 'h:mm A').format('HH:mm:ss');
     const formattedShiftEnd = moment(shiftEndsFrom, 'h:mm A').format('HH:mm:ss');
