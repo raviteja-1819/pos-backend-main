@@ -91,7 +91,7 @@ exports.signup = async (req, res) => {
       photo: base64Photo
     });
 
-    res.status(201).json({ userId, firstName, lastName, mobileNumber, email, shiftStartsFrom, shiftEndsFrom, roleId });
+    res.status(201).json({ userId, firstName, lastName, mobileNumber, email, shiftStartsFrom, shiftEndsFrom });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
