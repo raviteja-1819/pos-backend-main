@@ -1,16 +1,20 @@
 // Import necessary models
 const Order = require('../model/Order');
 const OrderItem = require('../model/OrderItem');
-
+const { v4: uuidv4 } = require('uuid'); 
 // Function to add an item to an order
 exports.addItemToOrder = async (req, res) => {
   try {
-    const { order_id, product_id, quantity, item_price } = req.body;
+    const { order_id, item_id, quantity, item_price } = req.body;
+    const uuid = uuidv4();
+    const order_item_id = uuid.substr(0, 5);
+
     const orderItem = await OrderItem.create({
       order_id: order_id,
-      product_id: product_id,
+      item_id: item_id,
       quantity: quantity,
-      item_price: item_price
+      item_price: item_price,
+      order_item_id: order_item_id
     });
 
     res.status(201).json({ message: 'Item added to order successfully', orderItem });
